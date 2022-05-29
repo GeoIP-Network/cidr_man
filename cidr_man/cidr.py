@@ -26,10 +26,12 @@ class CIDR:
     _is_reserved: bool
 
     def __init__(
-            self,
-            net: Union[str, int, bytes, IPv4Network, IPv6Network, IPv4Address, IPv6Address, None] = None,
-            version: Version = None,
-            prefix_len: int = -1
+        self,
+        net: Union[
+            str, int, bytes, IPv4Network, IPv6Network, IPv4Address, IPv6Address, None
+        ] = None,
+        version: Version = None,
+        prefix_len: int = -1,
     ):
         _version = Version.v4
         _prefix_len = -1
@@ -52,7 +54,9 @@ class CIDR:
             else:
                 self.__version = version
             if prefix_len == -1:
-                self.__prefix_len = _prefix_len if discovered else max_prefix(self.__version)
+                self.__prefix_len = (
+                    _prefix_len if discovered else max_prefix(self.__version)
+                )
             else:
                 self.__prefix_len = prefix_len
         else:
@@ -104,11 +108,11 @@ class CIDR:
         if self.__prefix_len != self.__max_prefix:
             prefix_len = self.__prefix_len
             mask = 1 << (self.__max_prefix - prefix_len)
-            return type(self)(self.__ip ^ (mask-1), self.__version)
+            return type(self)(self.__ip ^ (mask - 1), self.__version)
 
     @property
     def netmask(self) -> "CIDR":
-        mask = ((1 << self.__prefix_len)-1) << (self.__max_prefix-self.__prefix_len)
+        mask = ((1 << self.__prefix_len) - 1) << (self.__max_prefix - self.__prefix_len)
         return type(self)(mask, self.__version)
 
     @property
@@ -120,7 +124,7 @@ class CIDR:
     @property
     def last_address(self) -> "CIDR":
         if self.__prefix_len != self.__max_prefix:
-            return type(self)(int(self.broadcast_address)-1, self.__version)
+            return type(self)(int(self.broadcast_address) - 1, self.__version)
         return self.copy()
 
     @property
@@ -150,14 +154,21 @@ class CIDR:
         mask = 1 << (self.__max_prefix - prefix_len)
         return type(self)(self.__ip ^ mask, self.__version, prefix_len)
 
-    def subnet_of(self, other: Union["CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address]):
+    def subnet_of(
+        self,
+        other: Union[
+            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
+        ],
+    ):
         if not isinstance(other, type(self)):
             other = type(self)(other)
         return other.contains(self)
 
     def contains(
-            self,
-            subnet: Union["CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address]
+        self,
+        subnet: Union[
+            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
+        ],
     ) -> bool:
         if not isinstance(subnet, type(self)):
             subnet = type(self)(subnet)
@@ -252,7 +263,7 @@ class CIDR:
             return f"{'.'.join(reverse_nibbles)}.in-addr.arpa"
         reverse_nibbles = []
         for byte in self.packed[::-1]:
-            high_bits = byte>>4
+            high_bits = byte >> 4
             low_bits = byte - (high_bits << 4)
             reverse_nibbles.append(f"{low_bits:x}")
             reverse_nibbles.append(f"{high_bits:x}")
@@ -265,8 +276,10 @@ class CIDR:
         return deepcopy(self)
 
     def __contains__(
-            self,
-            subnet: Union["CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address]
+        self,
+        subnet: Union[
+            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
+        ],
     ) -> bool:
         return self.contains(subnet)
 
@@ -283,30 +296,34 @@ class CIDR:
         return self.packed
 
     def __lt__(
-            self,
-            other: Union["CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address]
+        self,
+        other: Union[
+            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
+        ],
     ):
         if self.__version != other.version:
             raise ValueError("ip version mismatch")
         return self.contains(other) and not other.contains(self)
 
     def __eq__(
-            self,
-            subnet: Union["CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address]
+        self,
+        subnet: Union[
+            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
+        ],
     ):
         if not isinstance(subnet, type(self)):
             subnet = type(self)(subnet)
         return (
-                self.__version == subnet.version
-                and
-                self.__prefix_len == subnet.prefix_len
-                and
-                self.__ip == subnet.ip
+            self.__version == subnet.version
+            and self.__prefix_len == subnet.prefix_len
+            and self.__ip == subnet.ip
         )
 
     def __gt__(
-            self,
-            other: Union["CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address]
+        self,
+        other: Union[
+            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
+        ],
     ):
         return other.contains(self) and not self.contains(other)
 
@@ -357,7 +374,9 @@ def _convert_str(net: str) -> tuple[Version, int, int]:
 
 
 @lru_cache(None)
-def _convert_builtin(net: Union[IPv4Network, IPv6Network, IPv4Address, IPv6Address]) -> tuple[Version, int, int]:
+def _convert_builtin(
+    net: Union[IPv4Network, IPv6Network, IPv4Address, IPv6Address]
+) -> tuple[Version, int, int]:
     version = Version(net.version)
     if isinstance(net, _BaseNetwork):
         ip = int(net.network_address)
@@ -380,8 +399,28 @@ def _convert_bytes(net: bytes) -> tuple[Version, int]:
 LINK_LOCAL = [CIDR("169.254.0.0/16"), CIDR("fe80::/10")]
 LOOPBACK = [CIDR("127.0.0.0/8"), CIDR("::1/128")]
 CARRIER = [CIDR("192.0.0.0/29"), CIDR("100.64.0.0/10"), CIDR("2002::/16")]
-DOCUMENTATION = [CIDR("192.0.2.0/24"), CIDR("198.51.100.0/24"), CIDR("203.0.113.0/24"), CIDR("2001:db8::/32"), CIDR("233.252.0.0/24")]
-PRIVATE = [CIDR("10.0.0.0/8"), CIDR("172.16.0.0/12"), CIDR("192.168.0.0/16"), CIDR("198.18.0.0/15"), CIDR("2001::/32"), CIDR("fc00::/7"), CIDR("64:ff9b:1::/48"), CIDR("2001:2::/48"), CIDR("100::/64"), *CARRIER, *LINK_LOCAL, *LOOPBACK, *DOCUMENTATION]
-RESERVED = [CIDR("240.0.0.0/4"), CIDR("::ffff:0:0/96"), * LOOPBACK]
+DOCUMENTATION = [
+    CIDR("192.0.2.0/24"),
+    CIDR("198.51.100.0/24"),
+    CIDR("203.0.113.0/24"),
+    CIDR("2001:db8::/32"),
+    CIDR("233.252.0.0/24"),
+]
+PRIVATE = [
+    CIDR("10.0.0.0/8"),
+    CIDR("172.16.0.0/12"),
+    CIDR("192.168.0.0/16"),
+    CIDR("198.18.0.0/15"),
+    CIDR("2001::/32"),
+    CIDR("fc00::/7"),
+    CIDR("64:ff9b:1::/48"),
+    CIDR("2001:2::/48"),
+    CIDR("100::/64"),
+    *CARRIER,
+    *LINK_LOCAL,
+    *LOOPBACK,
+    *DOCUMENTATION,
+]
+RESERVED = [CIDR("240.0.0.0/4"), CIDR("::ffff:0:0/96"), *LOOPBACK]
 MULTICAST = [CIDR("224.0.0.0/4"), CIDR("233.252.0.0/24"), CIDR("ff00::/8")]
 OTHER = [CIDR("192.0.0.0/24"), CIDR("2001::/23"), CIDR("2001:10::/28")]

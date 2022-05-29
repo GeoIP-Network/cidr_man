@@ -73,6 +73,7 @@ def test_cidr_contains():
     assert right.right.right in a
     assert CIDR("128.0.0.0/24") in a
 
+
 def test_cidr_v6_init():
     a = CIDR("::/0")
     assert a.prefix_len == 0
@@ -100,6 +101,7 @@ def test_cidr_v6_init_1():
     assert a.last_address == CIDR("7fff:ffff:ffff:ffff:ffff:ffff:ffff:fffe")
     assert a.netmask == CIDR("8000::")
 
+
 def test_cidr_v6_init_2():
     a = CIDR("8000::/1")
     assert a.prefix_len == 1
@@ -124,7 +126,6 @@ def test_cidr_v6_left():
     assert left.packed == b"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 
-
 def test_cidr_v6_right():
     a = CIDR("::/0")
     right = a.right
@@ -143,5 +144,3 @@ def test_cidr_v6_contains():
     assert left in a
     assert left.left.left in a
     assert right.right.right in a
-
-

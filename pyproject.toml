@@ -24,15 +24,19 @@ keywords = [
     "IPv6",
     "IPv4",
     "Networking",
-    "Network"
+    "Network",
+    "ipaddress",
+    "ip",
+    "address"
 ]
 include = ["cidr_bottle"]
 
 [tool.poetry.dependencies]
-python = "^3.9,<3.11"
+python = "^3.7,<3.11"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
+black = "^22.3.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

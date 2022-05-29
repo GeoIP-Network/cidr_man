@@ -119,7 +119,9 @@ def test_documentation():
         assert cidr.is_private == builtin.is_private
         assert cidr.is_reserved == builtin.is_reserved
         assert cidr.is_multicast == builtin.is_multicast
-    cidr = CIDR("233.252.0.0/24")  # "MCAST-TEST-NET" - https://datatracker.ietf.org/doc/html/rfc5771
+    cidr = CIDR(
+        "233.252.0.0/24"
+    )  # "MCAST-TEST-NET" - https://datatracker.ietf.org/doc/html/rfc5771
     builtin: IPv4Network = ip_network("233.252.0.0/24")
     assert cidr.is_link_local == builtin.is_link_local
     assert cidr.is_loopback == builtin.is_loopback
