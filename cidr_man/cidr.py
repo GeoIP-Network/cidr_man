@@ -100,7 +100,7 @@ class CIDR:
     @property
     def network_address(self) -> "CIDR":
         if self.__prefix_len != self.__max_prefix:
-            return self.__class__(self.__ip, self.__version)
+            return CIDR(self.__ip, self.__version)
         return self.copy()
 
     @property
@@ -108,23 +108,23 @@ class CIDR:
         if self.__prefix_len != self.__max_prefix:
             prefix_len = self.__prefix_len
             mask = 1 << (self.__max_prefix - prefix_len)
-            return self.__class__(self.__ip ^ (mask - 1), self.__version)
+            return CIDR(self.__ip ^ (mask - 1), self.__version)
 
     @property
     def netmask(self) -> "CIDR":
         mask = ((1 << self.__prefix_len) - 1) << (self.__max_prefix - self.__prefix_len)
-        return self.__class__(mask, self.__version)
+        return CIDR(mask, self.__version)
 
     @property
     def first_address(self) -> "CIDR":
         if self.__prefix_len != self.__max_prefix:
-            return self.__class__(self.__ip + 1, self.__version)
+            return CIDR(self.__ip + 1, self.__version)
         return self.copy()
 
     @property
     def last_address(self) -> "CIDR":
         if self.__prefix_len != self.__max_prefix:
-            return self.__class__(int(self.broadcast_address) - 1, self.__version)
+            return CIDR(int(self.broadcast_address) - 1, self.__version)
         return self.copy()
 
     @property
@@ -146,13 +146,13 @@ class CIDR:
     @property
     def left(self) -> "CIDR":
         prefix_len = self.__prefix_len + 1
-        return self.__class__(self.__ip, self.__version, prefix_len)
+        return CIDR(self.__ip, self.__version, prefix_len)
 
     @property
     def right(self) -> "CIDR":
         prefix_len = self.__prefix_len + 1
         mask = 1 << (self.__max_prefix - prefix_len)
-        return self.__class__(self.__ip ^ mask, self.__version, prefix_len)
+        return CIDR(self.__ip ^ mask, self.__version, prefix_len)
 
     def subnet_of(
         self,
@@ -160,8 +160,8 @@ class CIDR:
             "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
         ],
     ):
-        if not isinstance(other, self.__class__):
-            other = self.__class__(other)
+        if not isinstance(other, CIDR):
+            other = CIDR(other)
         return other.contains(self)
 
     def contains(
@@ -170,8 +170,8 @@ class CIDR:
             "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
         ],
     ) -> bool:
-        if not isinstance(subnet, self.__class__):
-            subnet = self.__class__(subnet)
+        if not isinstance(subnet, CIDR):
+            subnet = CIDR(subnet)
         if self.__version != subnet.version:
             raise ValueError("ip version mismatch")
         if self.__prefix_len > subnet.prefix_len:
@@ -311,8 +311,8 @@ class CIDR:
             "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
         ],
     ):
-        if not isinstance(subnet, self.__class__):
-            subnet = self.__class__(subnet)
+        if not isinstance(subnet, CIDR):
+            subnet = CIDR(subnet)
         return (
             self.__version == subnet.version
             and self.__prefix_len == subnet.prefix_len
