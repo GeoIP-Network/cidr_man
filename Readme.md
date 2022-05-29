@@ -5,7 +5,17 @@
 Built due to frustrations with python's built-in `ipaddress` library's performance, code complexity, and accuracy.
 CIDR-Man is an accurate high-performance IP address subnetting library.
 
+While the interface of this new library is a little different from that of the built-in library, we think you'll find it to be more "pythonic", and quite intuitive.
 
+*NOTE: While writing tests for this library we discovered that a number of the `is_<address type>` flags from the python built-in library were returning incorrect results. CIDR-Man is accurate as per the RFCs at the time of writing, thus our responses may differ.*
+
+## Key performance metrics (vs Built-in `ipaddress`)
+* `__init__`:    7.822x
+* `subnet_of`:   8.516x
+* `subnets`:     3.966x
+* `compressed`:  1.303x
+
+## CIDRs explained
 CIDR (or Classless Inter-Domain Routing) is a way of representing and handling IP addresses and networks. 
 Introduced in 1993 to replace the previous IP address class architecture, CIDRs offer more flexibility in addressing hierarchy in network designs.
 A block of IP addresses in CIDR notation would be represented as the first IP in the block followed by the number of bits in the bitmask separated by a forward slash. 
@@ -28,10 +38,6 @@ Using this representation a single IP address is simply one with a full bitmask,
 
 This means that our network subnetting library only needs a single class `CIDR`. 
 Utilising a single type `CIDR` to represent both network objects and individual addresses results in considerably more concise code.
-
-While the interface of this new library is a little different from that of the built-in library, we think you'll find it to be more "pythonic", and quite intuitive.
-
-*NOTE: While writing tests for this library we discovered that a number of the `is_<address type>` flags from the python built-in library were returning incorrect results. CIDR-Man is accurate as per the RFCs at the time of writing, thus our responses may differ.*
 
 ## Usage
 ### Initialisation
@@ -106,6 +112,10 @@ result = network_2 in network_1
 Alternatively
 ```python
 network_1.contains(network_2)
+```
+### Compat
+```python
+network_2.subnet_of(network_1)
 ```
 
 

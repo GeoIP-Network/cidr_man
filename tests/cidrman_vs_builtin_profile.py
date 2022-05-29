@@ -8,7 +8,7 @@ for i in range(1000):
     with open("data/children_test_data") as f:
         for line in f:
             net = CIDR(line.strip())
-            subnets += list(net.subnets)
+            subnets += list(net.subnets())
             net2 = IPv4Network(line.strip())
             subnets2 += list(net2.subnets())
     for i in range(1000):
