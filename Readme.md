@@ -5,6 +5,8 @@
 Built due to frustrations with python's built-in `ipaddress` library's performance, code complexity, and accuracy.
 CIDR-Man is an accurate high-performance IP address subnetting library.
 
+![An attractive screenshot of the example code below](https://gitlab.com/geoip.network/cidr_man/-/raw/master/screenshots/screenshot.png?inline=true)
+
 While the interface of this new library is a little different from that of the built-in library, we think you'll find it to be more "pythonic", and quite intuitive.
 
 *NOTE: While writing tests for this library we discovered that a number of the `is_<address type>` flags from the python built-in library were returning incorrect results. CIDR-Man is accurate as per the RFCs at the time of writing, thus our responses may differ.*
