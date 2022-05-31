@@ -313,9 +313,10 @@ class CIDR:
     ):
         if not isinstance(subnet, self.__class__):
             subnet = self.__class__(subnet)
+        if self.__version != subnet.version:
+            raise ValueError("ip version mismatch")
         return (
-            self.__version == subnet.version
-            and self.__prefix_len == subnet.prefix_len
+            self.__prefix_len == subnet.prefix_len
             and self.__ip == subnet.ip
         )
 
@@ -325,6 +326,8 @@ class CIDR:
             "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
         ],
     ):
+        if self.__version != other.version:
+            raise ValueError("ip version mismatch")
         return other.contains(self) and not self.contains(other)
 
     def __hash__(self):
