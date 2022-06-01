@@ -43,6 +43,11 @@ def test_cidr_init_2():
     assert a.netmask == CIDR("128.0.0.0")
 
 
+def test_cidr_init_hostbits():
+    a = CIDR("192.0.2.12/24")
+    assert a.ip == 3221225984
+
+
 def test_cidr_left():
     a = CIDR()
     left = a.left

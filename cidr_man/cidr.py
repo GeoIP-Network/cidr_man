@@ -63,6 +63,7 @@ class CIDR:
             self.__prefix_len = 0
             self.__version = Version.v4
             self.__ip = 0
+        self.__ip = _strip_host_bits(self.__ip, self.__prefix_len, self.__version)
         self.__max_prefix = max_prefix(self.__version)
         self.__packed = None
         self.__ip_str = None
@@ -397,6 +398,11 @@ def _convert_bytes(net: bytes) -> Tuple[Version, int]:
     else:
         version = Version.v6
     return version, int.from_bytes(net, "big", signed=False)
+
+
+def _strip_host_bits(ip: int, prefix_len: int, version: Version):
+    shift = (max_prefix(version) - prefix_len)
+    return (ip >> shift) << shift
 
 
 LINK_LOCAL = [CIDR("169.254.0.0/16"), CIDR("fe80::/10")]

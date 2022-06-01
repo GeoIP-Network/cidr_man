@@ -24,5 +24,6 @@ for i in range(1000):
         subnet = IPv4Network(f"{i % 255}.{i % 255}.0.0/24")
         b = subnet.compressed
 
-
-print(subnets.sort() == subnets2.sort())
+subnets.sort()
+subnets2.sort()
+print(subnets == subnets2)
