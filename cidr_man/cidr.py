@@ -121,7 +121,11 @@ class CIDR:
     @property
     def inverse_netmask(self) -> "CIDR":
         mask = ((1 << self.__prefix_len) - 1) << (self.__max_prefix - self.__prefix_len)
-        inverse_mask = mask ^ (0xFFFFFFFF if self.__version==Version.v4 else 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+        inverse_mask = mask ^ (
+            0xFFFFFFFF
+            if self.__version == Version.v4
+            else 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        )
         return self.__class__(inverse_mask, self.__version)
 
     @property
