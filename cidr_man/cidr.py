@@ -3,7 +3,11 @@ from enum import IntEnum
 from functools import lru_cache
 from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address, _BaseNetwork
 from socket import inet_pton, AF_INET, AF_INET6, inet_ntop
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional
+
+PREFIX_UNION_T = Union[
+    str, int, bytes, "CIDR", IPv4Network, IPv6Network, IPv4Address, IPv6Address
+]
 
 
 class Version(IntEnum):
@@ -27,11 +31,9 @@ class CIDR:
 
     def __init__(
         self,
-        net: Union[
-            str, int, bytes, IPv4Network, IPv6Network, IPv4Address, IPv6Address, None
-        ] = None,
-        version: Version = None,
-        prefix_len: int = -1,
+        net: Optional[PREFIX_UNION_T] = None,
+        version: Optional[Version] = None,
+        prefix_len: Optional[int] = -1,
     ):
         _version = Version.v4
         _prefix_len = -1
@@ -157,9 +159,7 @@ class CIDR:
 
     def subnet_of(
         self,
-        other: Union[
-            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
-        ],
+        other: PREFIX_UNION_T,
     ):
         if not isinstance(other, self.__class__):
             other = self.__class__(other)
@@ -167,9 +167,7 @@ class CIDR:
 
     def contains(
         self,
-        subnet: Union[
-            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
-        ],
+        subnet: PREFIX_UNION_T,
     ) -> bool:
         if not isinstance(subnet, self.__class__):
             subnet = self.__class__(subnet)
@@ -278,9 +276,7 @@ class CIDR:
 
     def __contains__(
         self,
-        subnet: Union[
-            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
-        ],
+        subnet: PREFIX_UNION_T,
     ) -> bool:
         return self.contains(subnet)
 
@@ -298,9 +294,7 @@ class CIDR:
 
     def __lt__(
         self,
-        other: Union[
-            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
-        ],
+        other: PREFIX_UNION_T,
     ):
         if self.__version != other.version:
             raise ValueError("ip version mismatch")
@@ -316,16 +310,11 @@ class CIDR:
             subnet = self.__class__(subnet)
         if self.__version != subnet.version:
             raise ValueError("ip version mismatch")
-        return (
-            self.__prefix_len == subnet.prefix_len
-            and self.__ip == subnet.ip
-        )
+        return self.__prefix_len == subnet.prefix_len and self.__ip == subnet.ip
 
     def __gt__(
         self,
-        other: Union[
-            "CIDR", str, int, IPv4Network, IPv6Network, IPv4Address, IPv6Address
-        ],
+        other: PREFIX_UNION_T,
     ):
         if self.__version != other.version:
             raise ValueError("ip version mismatch")
@@ -366,7 +355,7 @@ def _convert_str(net: str) -> Tuple[Version, int, int]:
     else:
         ip_s = parts[0]
         prefix = None
-    if "." in ip_s:
+    if ":" not in ip_s:
         version = Version.v4
         ip = inet_pton(AF_INET, ip_s)
         prefix = prefix if prefix is not None else 32
@@ -401,7 +390,7 @@ def _convert_bytes(net: bytes) -> Tuple[Version, int]:
 
 
 def _strip_host_bits(ip: int, prefix_len: int, version: Version):
-    shift = (max_prefix(version) - prefix_len)
+    shift = max_prefix(version) - prefix_len
     return (ip >> shift) << shift
 
 
