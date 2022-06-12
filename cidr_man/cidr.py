@@ -119,6 +119,12 @@ class CIDR:
         return self.__class__(mask, self.__version)
 
     @property
+    def inverse_netmask(self) -> "CIDR":
+        mask = ((1 << self.__prefix_len) - 1) << (self.__max_prefix - self.__prefix_len)
+        inverse_mask = mask ^ (0xFFFFFFFF if self.__version==Version.v4 else 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+        return self.__class__(inverse_mask, self.__version)
+
+    @property
     def first_address(self) -> "CIDR":
         if self.__prefix_len != self.__max_prefix:
             return self.__class__(self.__ip + 1, self.__version)
