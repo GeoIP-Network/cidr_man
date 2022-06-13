@@ -1,7 +1,15 @@
 from copy import deepcopy
 from enum import IntEnum
 from functools import lru_cache
-from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address, _BaseNetwork, ip_network, ip_address
+from ipaddress import (
+    IPv4Network,
+    IPv6Network,
+    IPv4Address,
+    IPv6Address,
+    _BaseNetwork,
+    ip_network,
+    ip_address,
+)
 from socket import inet_pton, AF_INET, AF_INET6, inet_ntop
 from typing import Union, Tuple, Optional
 
