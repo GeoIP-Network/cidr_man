@@ -1,7 +1,7 @@
 from copy import deepcopy
 from enum import IntEnum
 from functools import lru_cache
-from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address, _BaseNetwork
+from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address, _BaseNetwork, ip_network, ip_address
 from socket import inet_pton, AF_INET, AF_INET6, inet_ntop
 from typing import Union, Tuple, Optional
 
@@ -310,6 +310,14 @@ class CIDR:
             raise ValueError("ip version mismatch")
         return self.contains(other) and not other.contains(self)
 
+    def __lte__(
+        self,
+        other: PREFIX_UNION_T,
+    ):
+        if self.__version != other.version:
+            raise ValueError("ip version mismatch")
+        return self.contains(other)
+
     def __eq__(
         self,
         subnet: Union[
@@ -330,8 +338,23 @@ class CIDR:
             raise ValueError("ip version mismatch")
         return other.contains(self) and not self.contains(other)
 
+    def __gte__(
+        self,
+        other: PREFIX_UNION_T,
+    ):
+        if self.__version != other.version:
+            raise ValueError("ip version mismatch")
+        return other.contains(self)
+
     def __hash__(self):
-        return hash(str(self))
+        return self.__ip, self.__prefix_len
+
+    def __format__(self, fmt):
+        if self.__prefix_len != self.__max_prefix:
+            network = ip_address(self.compressed)
+        else:
+            network = ip_network(self.compressed)
+        return format(network, fmt)
 
     @property
     def _ip_str(self):

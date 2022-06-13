@@ -104,20 +104,29 @@ right_of_left = network.left.right  # CIDR(192.0.2.64/26")
 ```
 
 ## Contains
-Checking if one network is the subnet of another
+Checking if an address or network is the subnet of another is made simpler, with `subnet in supernet` syntax fully supported.
 ```python
 network_1 = CIDR("192.0.2.0/24")
 network_2 = CIDR("192.0.2.0/26")
+
 result = network_2 in network_1
+# or 
+result = network_1.contains(network_2)
 ```
 
-Alternatively
-```python
-network_1.contains(network_2)
-```
-### Compat
+Alternatively if you prefer the built-in library's style we've included `subnet_of` for compatibility.
 ```python
 network_2.subnet_of(network_1)
+```
+
+As well as additional support for `subnet < supernet`,`subnet <= supernet`,`subnet > supernet`, `subnet >= supernet`, and `subnet == supernet`
+*NOTE: These are perhaps counter-intuitive as this in the inverse of the size of the address space, but as this is how python's library defines the operations we're maintaining compatibility
+```python
+subnet < supernet   # Returns True if subnet has less specific prefix than supernet 
+subnet <= supernet  # Returns True if subnet has a less than or equal prefix than supernet
+subnet > supernet   # Returns True if subnet has a less specific prefix than supernet
+subnet >= supernet  # Returns True if subnet has a greater than or equal prefix supernet
+subnet == supernet  # Returns True if subnet is exactly equal to supernet
 ```
 
 
@@ -134,42 +143,58 @@ Therefore, both `CIDR("192.0.2.1")` and `CIDR("192.0.2.1/32")` produce the prese
 ```python
 # IPv4
 
-ip_s = ip.compressed  # "192.0.2.1"
+ip_s = ip.compressed                # "192.0.2.1"
 ### or
-ip_s = str(ip)  # "192.0.2.1"
+ip_s = str(ip)                      # "192.0.2.1"
+
 
 ## CIDRs who's prefix is not the max_prefix are presented in CIDR presentation format
-network_s = network.compressed  # "192.0.2.0/24"
+network_s = network.compressed      # "192.0.2.0/24"
 ### or
-network_s = str(ip)  # "192.0.2.0/24"
+network_s = str(ip)                 # "192.0.2.0/24"
 
 
 # IPv6
-ipv6_s = ip.compressed  # "2001:db8::1"
+ipv6_s = ip.compressed              # "2001:db8::1"
 ### or
-ipv6_s = str(ip)  # "2001:db8::1"
+ipv6_s = str(ip)                    # "2001:db8::1"
 
-network_v6_s = network.compressed  # "2001:db8::/56"
+
+network_v6_s = network.compressed   # "2001:db8::/56"
 ## or
-network_v6_s = str(ip)  # "2001:db8::/56"
+network_v6_s = str(ip)              # "2001:db8::/56"
 ```
 
 ## Important addresses
-`network_address`, `broadcast_address`, `netmask`, `first_address`, and `last_address` each provide the relevant addresses as new CIDR objects.
+`network_address`, `broadcast_address`, `netmask`, `inverse_netmask`, `first_address`, and `last_address` each provide the relevant addresses as new CIDR objects.
 ```python
 # IPv4
-net_address         = network.network_address  # 192.0.2.0
-first_address       = network.first_address  # 192.0.2.1
-last_address        = network.last_address  # 192.0.2.254
-broadcast_address   = network.network_address  # 192.0.2.255
-netmask             = network.netmask  # 255.255.255.0
+net_address         = network.network_address   # 192.0.2.0
+first_address       = network.first_address     # 192.0.2.1
+last_address        = network.last_address      # 192.0.2.254
+broadcast_address   = network.network_address   # 192.0.2.255
+netmask             = network.netmask           # 255.255.255.0
+inverse_netmask     = network.inverse_netmask   # 0.0.0.255
 
 # IPv6
 net_address_v6         = network_v6.network_address  # 2001:db8::
-first_address_v6       = network_v6.first_address  # 2001:db8::1
-last_address_v6        = network_v6.last_address  # 2001:db8:0:ff:ffff:ffff:ffff:fffe
+first_address_v6       = network_v6.first_address    # 2001:db8::1
+last_address_v6        = network_v6.last_address     # 2001:db8:0:ff:ffff:ffff:ffff:fffe
 broadcast_address_v6   = network_v6.network_address  # 2001:db8:0:ff:ffff:ffff:ffff:ffff
-netmask_v6             = network_v6.netmask  # ffff:ffff:ffff:ff00::
+netmask_v6             = network_v6.netmask          # ffff:ffff:ffff:ff00::
+inverse_netmask_v6     = network_v6.inverse_netmask  # ::ff:ffff:ffff:ffff:ffff
+```
+
+## is_ flags
+
+*NOTE: While writing tests for this library we discovered that a number of the `is_<address type>` flags from the python built-in library were returning incorrect results. CIDR-Man is accurate as per the RFCs at the time of writing, thus our responses may differ.*
+```python
+is_multicast    = network.is_multicast  # True if the address is reserved for multicast use by RFCs.
+is_global       = network.is_global     # True if the address is allocated for public networks.
+is_private      = network.is_private    # True if the address is allocated for private networks.
+is_reserved     = network.is_reserved   # True if the address is otherwise IETF reserved.
+is_loopback     = network.is_loopback   # True if this is a loopback address.
+is_link_local   = network.is_link_local # True if the address is reserved for link-local usage.
 ```
 
 
