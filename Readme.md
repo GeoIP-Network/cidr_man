@@ -13,7 +13,7 @@ While the interface of this new library is a little different from that of the b
 
 ## Key performance metrics (vs Built-in `ipaddress`)
 * `__init__`:    7.822x
-* `supernet`:    
+* `supernet`:    2.186x
 * `subnet_of`:   8.516x
 * `subnets`:     3.966x
 * `compressed`:  1.303x
