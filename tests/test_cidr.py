@@ -48,6 +48,16 @@ def test_cidr_init_hostbits():
     assert a.ip == 3221225984
 
 
+def test_cidr_supernet():
+    a = CIDR("192.0.2.0/25")
+    sup = a.supernet()
+    assert sup.prefix_len == 24
+    assert sup.version == 4
+    assert sup.ip == 3221225984
+    assert sup.compressed == "192.0.2.0/24"
+    assert sup == CIDR("192.0.2.0/24")
+
+
 def test_cidr_left():
     a = CIDR()
     left = a.left

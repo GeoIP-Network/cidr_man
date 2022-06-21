@@ -23,6 +23,11 @@ for i in range(1000):
         a = subnet.compressed
         subnet = IPv4Network(f"{i % 255}.{i % 255}.0.0/24")
         b = subnet.compressed
+    for i in range(1000):
+        subnet = CIDR(f"{i % 255}.{i % 255}.0.0/24").supernet()
+        a = subnet.compressed
+        subnet = IPv4Network(f"{i % 255}.{i % 255}.0.0/24").supernet()
+        b = subnet.compressed
 
 subnets.sort()
 subnets2.sort()

@@ -13,6 +13,7 @@ While the interface of this new library is a little different from that of the b
 
 ## Key performance metrics (vs Built-in `ipaddress`)
 * `__init__`:    7.822x
+* `supernet`:    
 * `subnet_of`:   8.516x
 * `subnets`:     3.966x
 * `compressed`:  1.303x
@@ -102,6 +103,15 @@ These can be chained for quick traversal
 left_of_left = network.left.left  # CIDR("192.0.2.0/26")
 right_of_left = network.left.right  # CIDR(192.0.2.64/26")
 ```
+
+## Get supernets
+Retrieving the direct supernet of a network is easy.
+
+```python
+network = CIDR("192.0.2.0/25")
+supernet = network.supernet()  # CIDR("192.0.2.0/24")
+```
+
 
 ## Contains
 Checking if an address or network is the subnet of another is made simpler, with `subnet in supernet` syntax fully supported.

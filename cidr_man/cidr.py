@@ -161,6 +161,10 @@ class CIDR:
             self.__packed = self.__ip.to_bytes(length, "big", signed=False)
         return self.__packed
 
+    def supernet(self) -> "CIDR":
+        prefix_len = self.__prefix_len - 1
+        return self.__class__(self.__ip, self.__version, prefix_len)
+
     def subnets(self) -> Tuple["CIDR", "CIDR"]:
         return self.left, self.right
 
