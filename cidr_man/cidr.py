@@ -359,7 +359,7 @@ class CIDR:
         return other.contains(self)
 
     def __hash__(self):
-        return self.__ip, self.__prefix_len
+        return (self.__ip, self.__prefix_len).__hash__()
 
     def __format__(self, fmt):
         if self.__prefix_len != self.__max_prefix:
