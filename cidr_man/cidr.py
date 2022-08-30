@@ -362,7 +362,7 @@ class CIDR:
         return (self.__ip, self.__prefix_len).__hash__()
 
     def __format__(self, fmt):
-        if self.__prefix_len != self.__max_prefix:
+        if self.__prefix_len == self.__max_prefix:
             network = ip_address(self.compressed)
         else:
             network = ip_network(self.compressed)
